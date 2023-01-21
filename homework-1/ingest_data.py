@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
 import os
 import argparse
 from time import time
@@ -22,17 +20,14 @@ def main(params):
     url = params.url
     date_cols = params.date_cols
 
-    if url.endswith('.csv.gz'):
-        csv_name = 'output.csv.gz'
-    else:
-        csv_name = 'output.csv'
+    output_filename = 'output.csv.gz' if url.endswith('.csv.gz') else 'output.csv'
 
-    os.system(f'wget {url} -O {csv_name}')
+    os.system(f'wget {url} -O {output_filename}')
 
     engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
 
     for df_chunk in pd.read_csv(
-        csv_name, iterator=True, chunksize=CHUNK_SIZE,
+        output_filename, iterator=True, chunksize=CHUNK_SIZE,
         parse_dates=date_cols.split(',') if date_cols else []
     ):
         t_start = time()
